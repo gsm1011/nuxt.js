@@ -18,7 +18,6 @@ import {
 } from './utils.js'
 import { createApp<% if (features.layouts) { %>, NuxtError<% } %> } from './index.js'
 import NuxtLink from './components/nuxt-link.<%= features.clientPrefetch ? "client" : "server" %>.js' // should be included after ./index.js
-<% if (nuxtOptions.render.ssrLog) { %>import BrowserReporter from 'consola/src/reporters/browser'<% } %>
 
 // Component: <NuxtLink>
 Vue.component(NuxtLink.name, NuxtLink)
@@ -39,10 +38,9 @@ Object.assign(Vue.config, <%= serialize(vue.config) %>)<%= isTest ? '// eslint-d
 
 <% if (nuxtOptions.render.ssrLog) { %>
 const logs = NUXT.logs || []
-const browserConsola = new BrowserReporter()
 if (logs.length > 0) {
   console.group && console.group<%= nuxtOptions.render.ssrLog === 'collapsed' ? 'Collapsed' : '' %>("%c🚀 Nuxt SSR Logs", 'font-size: 110%')
-  logs.forEach(logObj => browserConsola.log(logObj))
+  logs.forEach(({args = [], type}) => (console[type] || console.log)(...args))
   delete NUXT.logs
   console.group && console.groupEnd()
 }
